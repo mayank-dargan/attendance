@@ -47,10 +47,11 @@ if(isset($_POST['submit'])){
 		'".$_POST['pass_type']."'
 		)";
 		$insertRes = $conn->query($insert);
+		$_POST['sangat_id'] = $conn->insert_id;
 		$message = "You have successfully added the Sangat";
 		
 	}
-		
+	uploadFile();	
 } 
 // On Page Load;
 if(isset($_REQUEST['sangat_id'])){
@@ -81,7 +82,7 @@ if(isset($_REQUEST['sangat_id'])){
  $button= "Save";
 }
 ?>
-<form method="post" action="<?php $_SERVER['PHP_SELF']?>">
+<form method="post" action="<?php $_SERVER['PHP_SELF']?>" enctype="multipart/form-data">
 <?php if(isset($message)){ ?>
 <div class="alert alert-success"><?php echo $message; ?></div>
 <?php } ?>
@@ -142,9 +143,28 @@ if(isset($_REQUEST['sangat_id'])){
 <label>Address</label>
 <textarea name="address" class="form-control" colspan="5"><?php echo isset($result['address']) ? $result['address'] : '' ?></textarea>
 </div>
+<div class="form-group col-sm-4">
+<label>Upload Medical Report</label>
+<input class="form-control" type=file name="file">
+</div>
+<div class="form-group col-sm-4">
+<?php 
+$fileName = $result['bhatti_id_no'].'_'.$result['name'].'_MEDICAL.pdf';
+if(file_exists("./medical_reports/".$fileName)){ ?>
+<a href = "<?php echo "./medical_reports/".$fileName;?>">Download Medical Report</a>	
+<?php } ?>
+</div>
 <div class="form-group col-sm-12">
 <button name="submit" value="submit" type="submit" class="btn btn-primary"><?php echo $button; ?></button>
 </div>
 </div>
 </div>
 </form>
+<?php function uploadFile(){
+	if(isset($_FILES) && !empty($_FILES["file"])){
+		$file=$_FILES["file"];
+		$fileName = $_POST['bhatti_id_no'].'_'.$_POST['name'].'_MEDICAL.pdf';
+		$destination = './medical_reports/'.$fileName;
+		move_uploaded_file($file['tmp_name'],$destination);
+	}
+}?>
